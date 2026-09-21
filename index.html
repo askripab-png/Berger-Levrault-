@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full bg-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Berger-Levrault - Portail Mairie RH & Finances (Données Agrégées)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bl: {
+                            red: '#E30613',       /* Berger-Levrault Red */
+                            darkRed: '#A0030B',   /* Dark Accent */
+                            lightRed: '#FEE2E2',  /* Red Highlight */
+                            hoverRed: '#C40410',
+                            charcoal: '#1E293B'
+                        },
+                        rf: {
+                            blue: '#000091',
+                            red: '#E1000F'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="h-full font-sans text-slate-800 bg-slate-100 flex flex-col antialiased overflow-hidden">
+
+    <!-- Top Bar / Official Institutional Header -->
+    <header class="bg-white border-b border-slate-200 px-5 py-2.5 flex items-center justify-between shrink-0 shadow-sm z-30">
+        <div class="flex items-center space-x-6">
+            <!-- Official RF Marianne Block -->
+            <div class="flex items-center space-x-3 pr-5 border-r border-slate-200">
+                <div class="flex flex-col text-[10px] uppercase font-bold tracking-tighter leading-tight text-slate-900 border-l-2 border-rf-blue pl-2">
+                    <span class="text-rf-blue">RÉPUBLIQUE</span>
+                    <span class="text-slate-800">FRANÇAISE</span>
+                    <span class="text-rf-red text-[7.5px] tracking-normal font-medium">Liberté · Égalité · Fraternité</span>
+                </div>
+            </div>
+
+            <!-- Berger-Levrault Software Suite Branding -->
+            <div class="flex items-center gap-3">
+                <div class="bg-bl-red text-white font-black px-3 py-1 rounded text-base tracking-tighter shadow-sm flex items-center gap-1.5">
+                    <span>BL</span>
+                    <span class="text-[10px] font-semibold bg-white/20 px-1.5 py-0.5 rounded uppercase">Berger-Levrault</span>
+                </div>
+                <div class="h-6 w-px bg-slate-200"></div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-extrabold text-slate-900 text-sm tracking-tight">e-MAGISTERT / PORTAIL MAIRIE</span>
+                        <span class="bg-slate-100 text-slate-700 border border-slate-300 text-[10px] font-bold px-2 py-0.5 rounded">Gestion Intégrée v8.4</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 font-medium">Pilotage Général RH, Finances & Budget Communal (100% Anonymisé)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Municipal Context & Anonymization Badge -->
+        <div class="flex items-center space-x-4">
+            <div class="hidden lg:flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full text-emerald-800 text-xs font-medium">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+                <span>Conforme RGPD · Aucune Donnée Personnelle</span>
+            </div>
+
+            <div class="flex items-center gap-3 border-l border-slate-200 pl-4">
+                <div class="w-8 h-8 rounded-full bg-bl-red text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                    SM
+                </div>
+                <div class="hidden sm:block text-left text-xs">
+                    <div class="font-bold text-slate-900">Mairie de Saint-Martin</div>
+                    <div class="text-[10px] text-slate-500">Direction Générale des Services (DGS)</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <div class="flex flex-1 overflow-hidden">
+
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0">
+            <!-- Municipal Module Selector -->
+            <div class="p-4 border-b border-slate-800">
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Modules Métiers Communaux</div>
+                <nav class="space-y-1">
+                    <button id="nav-overview" onclick="switchTab('overview')" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold bg-bl-red text-white transition-all shadow-sm">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                        <span>Vue d'ensemble</span>
+                    </button>
+                    <button id="nav-rh" onclick="switchTab('rh')" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-all">
+                        <i data-lucide="users" class="w-4 h-4 text-red-400"></i>
+                        <span>Procédures RH</span>
+                    </button>
+                    <button id="nav-finance" onclick="switchTab('finance')" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-all">
+                        <i data-lucide="coins" class="w-4 h-4 text-amber-400"></i>
+                        <span>Exécution Financière</span>
+                    </button>
+                    <button id="nav-export" onclick="switchTab('export')" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-all">
+                        <i data-lucide="file-spread-sheet" class="w-4 h-4 text-emerald-400"></i>
+                        <span>Exports & Rapports XML</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Service Filter Selection -->
+            <div class="p-4 border-b border-slate-800 flex-1 overflow-y-auto space-y-4">
+                <div>
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Filtrer par Service</div>
+                    <div class="space-y-1 text-xs">
+                        <button onclick="filterService('all')" class="w-full text-left px-2.5 py-1.5 rounded-lg bg-slate-800 text-white font-medium hover:bg-slate-700 service-btn" data-service="all">
+                            Tous les services
+                        </button>
+                        <button onclick="filterService('Technique')" class="w-full text-left px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors service-btn" data-service="Technique">
+                            Services Techniques
+                        </button>
+                        <button onclick="filterService('Petite Enfance')" class="w-full text-left px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors service-btn" data-service="Petite Enfance">
+                            Petite Enfance & Écoles
+                        </button>
+                        <button onclick="filterService('Administration')" class="w-full text-left px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors service-btn" data-service="Administration">
+                            Administration Générale
+                        </button>
+                        <button onclick="filterService('Police')" class="w-full text-left px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors service-btn" data-service="Police">
+                            Police Municipale
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pt-2 border-t border-slate-800">
+                    <button onclick="openRgpdModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs py-2 px-3 rounded-lg flex items-center justify-center gap-2 border border-slate-700">
+                        <i data-lucide="info" class="w-4 h-4 text-emerald-400"></i>
+                        <span>Charte d'Anonymisation</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Export Action Box -->
+            <div class="p-4 bg-slate-950/60 border-t border-slate-800">
+                <button onclick="downloadXmlFile()" class="w-full bg-bl-red hover:bg-bl-hoverRed text-white text-xs font-bold py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span>Télécharger Extrait XML</span>
+                </button>
+                <p class="text-[10px] text-slate-500 mt-2 text-center">Structure publique conforme au standard e-MAGISTERT</p>
+            </div>
+        </aside>
+
+        <!-- Main Workspace Area -->
+        <main class="flex-1 flex flex-col bg-slate-100 overflow-hidden">
+
+            <!-- Security Banner -->
+            <div class="bg-bl-red text-white px-5 py-2 text-xs flex items-center justify-between shrink-0 shadow-sm">
+                <div class="flex items-center gap-2.5">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-white"></i>
+                    <span class="font-bold">E-SERVICES MUNICIPAUX BERGER-LEVRAULT :</span>
+                    <span class="opacity-90 hidden md:inline">Système d'information garanti sans traitement de données nominatives ou confidentielles.</span>
+                </div>
+                <div class="flex items-center gap-3 text-[11px] font-mono bg-white/20 px-2.5 py-0.5 rounded">
+                    <span>ANONYMISATION : STRICTE</span>
+                </div>
+            </div>
+
+            <!-- Global Dashboard Indicators -->
+            <div class="p-6 bg-white border-b border-slate-200 shrink-0 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h1 class="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                            <span>Tableau de Bord Stratégique Municipal</span>
+                            <span class="text-xs font-mono bg-slate-100 text-slate-600 border border-slate-300 px-2 py-0.5 rounded">Exercice 2026</span>
+                        </h1>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Suivi synthétique des campagnes RH et de l'exécution des enveloppes budgétaires communales.
+                        </p>
+                    </div>
+
+                    <!-- XML Quick Export Action -->
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button onclick="downloadXmlFile()" class="bg-bl-red hover:bg-bl-hoverRed text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-sm transition-all">
+                            <i data-lucide="file-code" class="w-4 h-4"></i>
+                            Générer Rapport XML Générique
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Aggregated Metrics Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+                    <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl flex items-center justify-between">
+                        <div>
+                            <div class="text-[11px] font-bold text-slate-500 uppercase">Effectif Global Administré</div>
+                            <div class="text-xl font-black text-slate-900 mt-0.5">142 Agents</div>
+                            <div class="text-[10px] text-emerald-600 font-semibold">Postes budgétaires pourvus</div>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-red-100 text-bl-red flex items-center justify-center font-bold">
+                            <i data-lucide="users" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl flex items-center justify-between">
+                        <div>
+                            <div class="text-[11px] font-bold text-slate-500 uppercase">Taux de Présence Mensuel</div>
+                            <div class="text-xl font-black text-slate-900 mt-0.5">94.2 %</div>
+                            <div class="text-[10px] text-slate-500 font-medium">+0.8% par rapport à M-1</div>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
+                            <i data-lucide="trending-up" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl flex items-center justify-between">
+                        <div>
+                            <div class="text-[11px] font-bold text-slate-500 uppercase">Budget Fonctionnement Engagé</div>
+                            <div class="text-xl font-black text-slate-900 mt-0.5">68.4 %</div>
+                            <div class="text-[10px] text-amber-700 font-semibold">Conforme aux prévisions M57</div>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
+                            <i data-lucide="pie-chart" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl flex items-center justify-between">
+                        <div>
+                            <div class="text-[11px] font-bold text-slate-500 uppercase">Mandats & Titres Validés</div>
+                            <div class="text-xl font-black text-slate-900 mt-0.5">1 284 Actes</div>
+                            <div class="text-[10px] text-slate-500 font-medium">Flux comptable mensuel</div>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-800 flex items-center justify-center font-bold">
+                            <i data-lucide="check-check" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workspace Dynamic Content Container -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-6">
+
+                <!-- SECTION 1: RH PROCEDURES TABLE -->
+                <div id="section-rh" class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="clipboard-list" class="w-5 h-5 text-bl-red"></i>
+                            <h2 class="font-bold text-slate-900 text-sm">Suivi des Campagnes & Procédures RH Communales</h2>
+                        </div>
+                        <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono font-medium">GDRH Anonymisé</span>
+                    </div>
+
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-800 text-slate-300 text-[11px] font-bold uppercase tracking-wider border-b border-slate-700">
+                                <th class="p-3.5">Code Procédure</th>
+                                <th class="p-3.5">Libellé de la Campagne RH</th>
+                                <th class="p-3.5">Service Destinataire</th>
+                                <th class="p-3.5 text-center">Dossiers en Cours</th>
+                                <th class="p-3.5">Statut</th>
+                                <th class="p-3.5 text-right">Échéance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rhTableBody" class="divide-y divide-slate-200 text-xs">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- SECTION 2: FINANCIAL EXECUTION TABLE -->
+                <div id="section-finance" class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="receipt" class="w-5 h-5 text-amber-600"></i>
+                            <h2 class="font-bold text-slate-900 text-sm">Suivi des Lignes Budgétaires & Enveloppes Communales (M57)</h2>
+                        </div>
+                        <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono font-medium">Finances Publiques</span>
+                    </div>
+
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-800 text-slate-300 text-[11px] font-bold uppercase tracking-wider border-b border-slate-700">
+                                <th class="p-3.5">Chapitre / Compte</th>
+                                <th class="p-3.5">Libellé de l'Enveloppe Budgétaire</th>
+                                <th class="p-3.5">Budget Voté (€)</th>
+                                <th class="p-3.5">Enveloppe Engagée (€)</th>
+                                <th class="p-3.5">Taux d'Exécution</th>
+                                <th class="p-3.5 text-right">Statut Régie</th>
+                            </tr>
+                        </thead>
+                        <tbody id="financeTableBody" class="divide-y divide-slate-200 text-xs">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <!-- Footer Compliance Info Bar -->
+            <footer class="bg-white border-t border-slate-200 px-6 py-3 flex items-center justify-between text-[11px] text-slate-500 shrink-0">
+                <div class="flex items-center gap-4">
+                    <span class="font-bold text-slate-700">Berger-Levrault e-MAGISTERT</span>
+                    <span>·</span>
+                    <span>Conforme à la Réglementation RGPD & Textes sur l'Open Data Public</span>
+                    <span>·</span>
+                    <span class="text-bl-red font-semibold">Environnement Sécurisé Mairie</span>
+                </div>
+                <div>
+                    Système d'Information Municipal - V.8.4
+                </div>
+            </footer>
+
+        </main>
+
+    </div>
+
+    <!-- RGPD Modal -->
+    <div id="rgpdModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden border border-slate-200">
+            <div class="bg-bl-red text-white p-4 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                    <h3 class="font-bold text-sm">Garantie d'Anonymisation & Conformité RGPD</h3>
+                </div>
+                <button onclick="closeRgpdModal()" class="text-white/80 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-3 text-xs leading-relaxed text-slate-600">
+                <p>
+                    Ce portail de démonstration Berger-Levrault est spécialement conçu sans aucune donnée à caractère personnel (DCP) ou sensible :
+                </p>
+                <ul class="list-disc pl-5 space-y-1 text-slate-700">
+                    <li>Aucun nom, prénom ou identifiant individuel.</li>
+                    <li>Aucun Numéro d'Inscription au Répertoire (NIR) ni données médicales.</li>
+                    <li>Aucune coordonnée bancaire (RIB) ou information de surendettement.</li>
+                    <li>Restitution exclusive d'indicateurs agrégés et de lignes budgétaires globales.</li>
+                </ul>
+                <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 text-slate-500 text-[11px]">
+                    Standard conforme aux préconisations de la CNIL et du cadre e-MAGISTERT Berger-Levrault pour la publication de statistiques de gestion publique.
+                </div>
+            </div>
+            <div class="p-4 bg-slate-50 border-t border-slate-200 text-right">
+                <button onclick="closeRgpdModal()" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-xs font-bold hover:bg-slate-900">
+                    Compris
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs transform translate-y-10 opacity-0 transition-all pointer-events-none z-50 border border-slate-700">
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+        <span id="toastMessage">Action exécutée.</span>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        let currentService = 'all';
+
+        // 100% ANONYMOUS & GENERIC DATASETS
+        const rhProcedures = [
+            {
+                code: "RH-2026-CAMP01",
+                title: "Campagne d'évaluation annuelle des agents 2026",
+                service: "Administration",
+                count: 142,
+                status: "En cours",
+                dueDate: "2026-11-30"
+            },
+            {
+                code: "RH-2026-FORM04",
+                title: "Plan de formation hygiène, sécurité et prévention des risques",
+                service: "Technique",
+                count: 38,
+                status: "Planifié",
+                dueDate: "2026-10-15"
+            },
+            {
+                code: "RH-2026-POST02",
+                title: "Mise à jour du répertoire des fiches de poste",
+                service: "Petite Enfance",
+                count: 24,
+                status: "Validé",
+                dueDate: "2026-09-30"
+            },
+            {
+                code: "RH-2026-PLAN08",
+                title: "Gestion prévisionnelle des plannings de garde et astreintes d'été",
+                service: "Police",
+                count: 18,
+                status: "En cours",
+                dueDate: "2026-10-01"
+            },
+            {
+                code: "RH-2026-CONG03",
+                title: "Traitement des reports de congés annuels et CET",
+                service: "Administration",
+                count: 65,
+                status: "En cours",
+                dueDate: "2026-12-15"
+            }
+        ];
+
+        const financeLines = [
+            {
+                code: "Chapitre 011",
+                title: "Charges à caractère général (Fournitures, Énergie, Entretien)",
+                service: "Technique",
+                budget: 450000,
+                engaged: 310500,
+                status: "Régulière"
+            },
+            {
+                code: "Chapitre 012",
+                title: "Charges de personnel (Masse salariale globale)",
+                service: "Administration",
+                budget: 3200000,
+                engaged: 2176000,
+                status: "Conforme"
+            },
+            {
+                code: "Subvention 657",
+                title: "Enveloppe globale des subventions aux associations communales",
+                service: "Administration",
+                budget: 180000,
+                engaged: 165000,
+                status: "Validée"
+            },
+            {
+                code: "Marché MP-2026-02",
+                title: "Acquisition de fournitures scolaires et équipements pédagogiques",
+                service: "Petite Enfance",
+                budget: 85000,
+                engaged: 78200,
+                status: "Silo Fermé"
+            },
+            {
+                code: "Chapitre 014",
+                title: "Équipements de sécurité et renouvellement véhicules de patrouille",
+                service: "Police",
+                budget: 120000,
+                engaged: 92000,
+                status: "En cours"
+            }
+        ];
+
+        // Render Tables
+        function renderTables() {
+            // RH Table
+            const rhBody = document.getElementById('rhTableBody');
+            rhBody.innerHTML = '';
+
+            const filteredRH = rhProcedures.filter(p => currentService === 'all' || p.service === currentService);
+
+            filteredRH.forEach(p => {
+                let statusBadge = "bg-amber-100 text-amber-800 border-amber-200";
+                if (p.status === 'Validé') statusBadge = "bg-emerald-100 text-emerald-800 border-emerald-200";
+                if (p.status === 'Planifié') statusBadge = "bg-blue-100 text-blue-800 border-blue-200";
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition-colors';
+                tr.innerHTML = `
+                    <td class="p-3.5 font-mono font-bold text-slate-700">${p.code}</td>
+                    <td class="p-3.5 font-semibold text-slate-900">${p.title}</td>
+                    <td class="p-3.5">
+                        <span class="bg-slate-100 border border-slate-300 text-slate-700 px-2 py-0.5 rounded text-[10px] font-medium">
+                            ${p.service}
+                        </span>
+                    </td>
+                    <td class="p-3.5 text-center font-bold text-slate-800">${p.count} dossiers</td>
+                    <td class="p-3.5">
+                        <span class="border px-2 py-0.5 rounded-full text-[10px] font-bold ${statusBadge}">
+                            ${p.status}
+                        </span>
+                    </td>
+                    <td class="p-3.5 text-right font-mono text-slate-600">${p.dueDate}</td>
+                `;
+                rhBody.appendChild(tr);
+            });
+
+            // Finance Table
+            const finBody = document.getElementById('financeTableBody');
+            finBody.innerHTML = '';
+
+            const filteredFin = financeLines.filter(f => currentService === 'all' || f.service === currentService);
+
+            filteredFin.forEach(f => {
+                const pct = Math.round((f.engaged / f.budget) * 100);
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition-colors';
+                tr.innerHTML = `
+                    <td class="p-3.5 font-mono font-bold text-bl-red">${f.code}</td>
+                    <td class="p-3.5 font-semibold text-slate-900">${f.title}</td>
+                    <td class="p-3.5 font-mono text-slate-800">${f.budget.toLocaleString('fr-FR')} €</td>
+                    <td class="p-3.5 font-mono text-slate-800">${f.engaged.toLocaleString('fr-FR')} €</td>
+                    <td class="p-3.5">
+                        <div class="flex items-center gap-2">
+                            <div class="w-16 bg-slate-200 h-2 rounded-full overflow-hidden">
+                                <div class="bg-bl-red h-full" style="width: ${pct}%"></div>
+                            </div>
+                            <span class="font-bold text-xs">${pct}%</span>
+                        </div>
+                    </td>
+                    <td class="p-3.5 text-right">
+                        <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold">
+                            ${f.status}
+                        </span>
+                    </td>
+                `;
+                finBody.appendChild(tr);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Filter Service
+        function filterService(service) {
+            currentService = service;
+
+            document.querySelectorAll('.service-btn').forEach(btn => {
+                if (btn.dataset.service === service) {
+                    btn.className = "w-full text-left px-2.5 py-1.5 rounded-lg bg-slate-800 text-white font-medium service-btn";
+                } else {
+                    btn.className = "w-full text-left px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors service-btn";
+                }
+            });
+
+            renderTables();
+            showToast(`Filtre appliqué : ${service === 'all' ? 'Tous les services' : service}`);
+        }
+
+        // Switch Navigation Tabs
+        function switchTab(tab) {
+            const secRh = document.getElementById('section-rh');
+            const secFin = document.getElementById('section-finance');
+
+            if (tab === 'overview') {
+                secRh.style.display = 'block';
+                secFin.style.display = 'block';
+            } else if (tab === 'rh') {
+                secRh.style.display = 'block';
+                secFin.style.display = 'none';
+            } else if (tab === 'finance') {
+                secRh.style.display = 'none';
+                secFin.style.display = 'block';
+            } else if (tab === 'export') {
+                downloadXmlFile();
+                return;
+            }
+
+            document.querySelectorAll('aside nav button').forEach(btn => {
+                btn.className = "w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-all";
+            });
+
+            const activeBtn = document.getElementById(`nav-${tab}`);
+            if (activeBtn) {
+                activeBtn.className = "w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold bg-bl-red text-white transition-all shadow-sm";
+            }
+        }
+
+        // Generate and Download Anonymous XML File
+        function downloadXmlFile() {
+            let xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<RapportMunicipalPublic xmlns="http://www.berger-levrault.fr/eMAGISTERT/v8" DateExport="${new Date().toISOString()}">
+  <Collectivite>
+    <Nom>MAIRIE DE SAINT-MARTIN</Nom>
+    <CodeINSEE>75000</CodeINSEE>
+    <Regime>Collectivité Territoriale</Regime>
+    <Logiciel>Berger-Levrault e-MAGISTERT</Logiciel>
+    <StatutConformite>100% ANONYMISÉ - AUCUNE DONNÉE PERSONNELLE</StatutConformite>
+  </Collectivite>
+
+  <IndicateursAgreges>
+    <EffectifTotal>142</EffectifTotal>
+    <TauxPresenceMensuel>94.2</TauxPresenceMensuel>
+    <BudgetFonctionnementEngagePct>68.4</BudgetFonctionnementEngagePct>
+    <MandatsEtTitresValides>1284</MandatsEtTitresValides>
+  </IndicateursAgreges>
+
+  <ProceduresRHAnonymes>`;
+
+            rhProcedures.forEach(p => {
+                xmlContent += `
+    <Procedure Code="${p.code}">
+      <Titre>${escapeXml(p.title)}</Titre>
+      <ServiceDestinataire>${escapeXml(p.service)}</ServiceDestinataire>
+      <NombreDossiers>${p.count}</NombreDossiers>
+      <Statut>${escapeXml(p.status)}</Statut>
+      <Echeance>${p.dueDate}</Echeance>
+    </Procedure>`;
+            });
+
+            xmlContent += `
+  </ProceduresRHAnonymes>
+
+  <ExecutionFinanciereM57>`;
+
+            financeLines.forEach(f => {
+                xmlContent += `
+    <LigneBudgetaire Code="${f.code}">
+      <Libelle>${escapeXml(f.title)}</Libelle>
+      <Service>${escapeXml(f.service)}</Service>
+      <BudgetVoteEUR>${f.budget}</BudgetVoteEUR>
+      <EnveloppeEngageeEUR>${f.engaged}</EnveloppeEngageeEUR>
+      <StatutRegie>${escapeXml(f.status)}</StatutRegie>
+    </LigneBudgetaire>`;
+            });
+
+            xmlContent += `
+  </ExecutionFinanciereM57>
+</RapportMunicipalPublic>`;
+
+            const blob = new Blob([xmlContent], { type: 'text/xml;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", "donnees_publiques_mairie_bl.xml");
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast("Rapport public XML 'donnees_publiques_mairie_bl.xml' téléchargé !");
+        }
+
+        function escapeXml(unsafe) {
+            return unsafe.replace(/[<>&'"]/g, function (c) {
+                switch (c) {
+                    case '<': return '&lt;';
+                    case '>': return '&gt;';
+                    case '&': return '&amp;';
+                    case '\'': return '&apos;';
+                    case '"': return '&quot;';
+                }
+            });
+        }
+
+        function openRgpdModal() {
+            document.getElementById('rgpdModal').classList.remove('hidden');
+        }
+
+        function closeRgpdModal() {
+            document.getElementById('rgpdModal').classList.add('hidden');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMessage');
+
+            toastMsg.innerText = msg;
+            toast.classList.remove('translate-y-10', 'opacity-0', 'pointer-events-none');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0', 'pointer-events-none');
+            }, 2800);
+        }
+
+        window.onload = function() {
+            renderTables();
+        };
+    </script>
+</body>
+</html>
